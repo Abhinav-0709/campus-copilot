@@ -1,0 +1,251 @@
+{
+  "name": "Campus Information",
+  "last_updated": "2025-06-01",
+  "sections": [
+    {
+      "id": "library",
+      "title": "University Library",
+      "content": "The main university library offers a vast collection of books, journals, and digital resources.",
+      "hours": {
+        "monday": "8:00 AM - 10:00 PM",
+        "tuesday": "8:00 AM - 10:00 PM",
+        "wednesday": "8:00 AM - 10:00 PM",
+        "thursday": "8:00 AM - 10:00 PM",
+        "friday": "8:00 AM - 6:00 PM",
+        "saturday": "10:00 AM - 5:00 PM",
+        "sunday": "12:00 PM - 8:00 PM"
+      },
+      "location": "Building A, Main Campus",
+      "contact": {
+        "phone": "+1 (555) 123-4567",
+        "email": "library@university.edu"
+      }
+    },
+    {
+      "id": "cafeteria",
+      "title": "Campus Cafeteria",
+      "content": "The main dining facility offering a variety of meal options for students and staff.",
+      "hours": {
+        "monday": "7:00 AM - 8:00 PM",
+        "tuesday": "7:00 AM - 8:00 PM",
+        "wednesday": "7:00 AM - 8:00 PM",
+        "thursday": "7:00 AM - 8:00 PM",
+        "friday": "7:00 AM - 7:00 PM",
+        "saturday": "9:00 AM - 4:00 PM",
+        "sunday": "Closed"
+      },
+      "location": "Student Center, Ground Floor",
+      "contact": {
+        "phone": "+1 (555) 123-4568",
+        "email": "dining@university.edu"
+      }
+    },
+    {
+      "id": "gym",
+      "title": "Campus Recreation Center",
+      "content": "State-of-the-art fitness facility with gym equipment, swimming pool, and sports courts.",
+      "hours": {
+        "monday": "6:00 AM - 11:00 PM",
+        "tuesday": "6:00 AM - 11:00 PM",
+        "wednesday": "6:00 AM - 11:00 PM",
+        "thursday": "6:00 AM - 11:00 PM",
+        "friday": "6:00 AM - 10:00 PM",
+        "saturday": "8:00 AM - 8:00 PM",
+        "sunday": "10:00 AM - 10:00 PM"
+      },
+      "location": "Recreation Center, North Campus",
+      "contact": {
+        "phone": "+1 (555) 123-4569",
+        "email": "recreation@university.edu"
+      },
+      "features": [
+        "Weight Room",
+        "Cardio Equipment",
+        "Basketball Courts",
+        "Swimming Pool",
+        "Group Fitness Classes"
+      ]
+    },
+    {
+      "id": "health_center",
+      "title": "Student Health Center",
+      "content": "Provides medical services, counseling, and wellness programs for students.",
+      "hours": {
+        "monday": "8:00 AM - 6:00 PM",
+        "tuesday": "8:00 AM - 6:00 PM",
+        "wednesday": "9:00 AM - 6:00 PM",
+        "thursday": "8:00 AM - 6:00 PM",
+        "friday": "8:00 AM - 5:00 PM",
+        "saturday": "10:00 AM - 2:00 PM",
+        "sunday": "Closed"
+      },
+      "location": "Health Services Building",
+      "contact": {
+        "phone": "+1 (555) 123-4570",
+        "email": "health@university.edu"
+      },
+      "services": [
+        "Primary Care",
+        "Mental Health Counseling",
+        "Immunizations",
+        "Health Education",
+        "Laboratory Services"
+      ]
+    },
+    {
+      "id": "parking",
+      "title": "Parking Services",
+      "content": "Information about parking permits, regulations, and campus parking lots.",
+      "hours": {
+        "monday": "7:30 AM - 5:00 PM",
+        "tuesday": "7:30 AM - 5:00 PM",
+        "wednesday": "7:30 AM - 5:00 PM",
+        "thursday": "7:30 AM - 5:00 PM",
+        "friday": "7:30 AM - 5:00 PM",
+        "saturday": "Closed",
+        "sunday": "Closed"
+      },
+      "location": "Parking Services Building",
+      "contact": {
+        "phone": "+1 (555) 123-4571",
+        "email": "parking@university.edu"
+      },
+      "permit_types": [
+        "Student Permit",
+        "Faculty/Staff Permit",
+        "Visitor Pass",
+        "Temporary Permit"
+      ]
+    },
+    {
+      "id": "bookstore",
+      "title": "Campus Bookstore",
+      "content": "Sells textbooks, school supplies, university apparel, and other merchandise.",
+      "hours": {
+        "monday": "9:00 AM - 6:00 PM",
+        "tuesday": "9:00 AM - 6:00 PM",
+        "wednesday": "9:00 AM - 6:00 PM",
+        "thursday": "9:00 AM - 6:00 PM",
+        "friday": "9:00 AM - 5:00 PM",
+        "saturday": "10:00 AM - 4:00 PM",
+        "sunday": "Closed"
+      },
+      "location": "Student Center, First Floor",
+      "contact": {
+        "phone": "+1 (555) 123-4572",
+        "email": "bookstore@university.edu"
+      },
+      "services": [
+        "Textbook Sales & Rental",
+        "General Books",
+        "School Supplies",
+        "University Merchandise",
+        "Technology Products"
+      ]
+    },
+    {
+      "id": "career_center",
+      "title": "Career Development Center",
+      "content": "Provides career counseling, job search assistance, and professional development resources.",
+      "hours": {
+        "monday": "8:30 AM - 5:00 PM",
+        "tuesday": "8:30 AM - 5:00 PM",
+        "wednesday": "8:30 AM - 5:00 PM",
+        "thursday": "8:30 AM - 5:00 PM",
+        "friday": "8:30 AM - 5:00 PM",
+        "saturday": "Closed",
+        "sunday": "Closed"
+      },
+      "location": "Student Services Building, 2nd Floor",
+      "contact": {
+        "phone": "+1 (555) 123-4573",
+        "email": "careers@university.edu"
+      },
+      "services": [
+        "Resume & Cover Letter Review",
+        "Mock Interviews",
+        "Job Search Strategies",
+        "Career Fairs",
+        "Internship Assistance"
+      ]
+    },
+    {
+      "id": "it_helpdesk",
+      "title": "IT Help Desk",
+      "content": "Technical support for university technology services, including email, Wi-Fi, and software.",
+      "hours": {
+        "monday": "7:00 AM - 10:00 PM",
+        "tuesday": "7:00 AM - 10:00 PM",
+        "wednesday": "7:00 AM - 10:00 PM",
+        "thursday": "7:00 AM - 10:00 PM",
+        "friday": "7:00 AM - 8:00 PM",
+        "saturday": "10:00 AM - 6:00 PM",
+        "sunday": "12:00 PM - 8:00 PM"
+      },
+      "location": "Library, 1st Floor",
+      "contact": {
+        "phone": "+1 (555) 123-4574",
+        "email": "helpdesk@university.edu"
+      },
+      "services": [
+        "Password Resets",
+        "Wi-Fi Support",
+        "Software Installation",
+        "Email Support",
+        "Hardware Troubleshooting"
+      ]
+    },
+    {
+      "id": "registrar",
+      "title": "Registrar's Office",
+      "content": "Handles course registration, transcripts, academic records, and graduation requirements.",
+      "hours": {
+        "monday": "8:00 AM - 5:00 PM",
+        "tuesday": "8:00 AM - 5:00 PM",
+        "wednesday": "8:00 AM - 5:00 PM",
+        "thursday": "8:00 AM - 5:00 PM",
+        "friday": "8:00 AM - 5:00 PM",
+        "saturday": "Closed",
+        "sunday": "Closed"
+      },
+      "location": "Administration Building, 1st Floor",
+      "contact": {
+        "phone": "+1 (555) 123-4575",
+        "email": "registrar@university.edu"
+      },
+      "services": [
+        "Registration",
+        "Transcripts",
+        "Enrollment Verification",
+        "Degree Audit",
+        "Residency Classification"
+      ]
+    },
+    {
+      "id": "financial_aid",
+      "title": "Financial Aid Office",
+      "content": "Assists students with financial aid applications, scholarships, grants, and student loans.",
+      "hours": {
+        "monday": "8:30 AM - 5:00 PM",
+        "tuesday": "8:30 AM - 5:00 PM",
+        "wednesday": "8:30 AM - 5:00 PM",
+        "thursday": "8:30 AM - 5:00 PM",
+        "friday": "8:30 AM - 4:30 PM",
+        "saturday": "Closed",
+        "sunday": "Closed"
+      },
+      "location": "Student Services Building, 1st Floor",
+      "contact": {
+        "phone": "+1 (555) 123-4576",
+        "email": "finaid@university.edu"
+      },
+      "services": [
+        "FAFSA Assistance",
+        "Scholarships",
+        "Grants",
+        "Student Loans",
+        "Work-Study Programs"
+      ]
+    }
+  ]
+}

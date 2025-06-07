@@ -1,0 +1,258 @@
+{
+    "last_updated": "2025-06-03",
+    "academic_info": {
+      "admission": {
+        "process": "Admission is based on 10+2 marks and entrance exam scores. Application forms are available online on the university portal.",
+        "documents_required": ["10th and 12th mark sheets", "Transfer Certificate", "Migration Certificate", "Aadhar Card", "Passport size photos"],
+        "important_dates": {
+          "application_start": "2025-04-01",
+          "application_end": "2025-05-31",
+          "counseling": "2025-06-15 to 2025-06-30",
+          "classes_begin": "2025-07-15"
+        }
+      },
+      "examinations": {
+        "schedule": "Mid-semester exams in September, End-semester in December and May",
+        "grading_system": {
+          "A+": "90-100%",
+          "A": "80-89%",
+          "B+": "70-79%",
+          "B": "60-69%",
+          "C": "50-59%",
+          "D": "40-49%",
+          "F": "Below 40% (Fail)"
+        },
+        "revaluation": {
+          "process": "Apply within 10 days of result declaration",
+          "fee": "₹500 per paper",
+          "timeline": "Results within 15 working days"
+        }
+      },
+      "scholarships": [
+        {
+          "name": "Merit Scholarship",
+          "eligibility": "90%+ in 12th standard",
+          "amount": "25% tuition fee waiver",
+          "deadline": "2025-07-31"
+        },
+        {
+          "name": "Sports Quota Scholarship",
+          "eligibility": "State/National level players",
+          "amount": "Up to 50% tuition fee waiver",
+          "deadline": "2025-08-15"
+        }
+      ]
+    },
+    "campus_life": {
+      "hostels": {
+        "boys": ["A Block", "B Block", "C Block"],
+        "girls": ["X Block", "Y Block", "Z Block"],
+        "rules": {
+          "curfew": "10:00 PM (Sun-Thu), 11:00 PM (Fri-Sat)",
+          "visiting_hours": "4:00 PM - 7:00 PM",
+          "mess_timings": {
+            "breakfast": "7:30 AM - 9:30 AM",
+            "lunch": "12:30 PM - 2:30 PM",
+            "dinner": "7:30 PM - 9:30 PM"
+          }
+        }
+      },
+      "clubs": [
+        {
+          "name": "Coding Club",
+          "faculty_incharge": "Dr. Gaurav Chaturvedi",
+          "meeting_schedule": "Every Saturday, 3:00 PM - 5:00 PM"
+        },
+        {
+          "name": "Robotics Club",
+          "faculty_incharge": "Dr. Anupam",
+          "meeting_schedule": "Every Sunday, 10:00 AM - 1:00 PM"
+        }
+      ]
+    },
+    "student_support": {
+      "counseling": {
+        "available": true,
+        "timings": "10:00 AM - 4:00 PM (Mon-Fri)",
+        "contact": "counseling@ritroorkee.com"
+      },
+      "emergency_contacts": {
+        "security": "+91 9876543210",
+        "medical": "+91 9876543211",
+        "warden_boys": "+91 9876543212",
+        "warden_girls": "+91 9876543213"
+      },
+      "transportation": {
+        "bus_routes": ["City Center", "Railway Station", "Bus Stand"],
+        "frequency": "Every 30 minutes (7:00 AM - 9:00 PM)"
+      }
+    },
+    "faqs": [
+      {
+        "question": "How do I apply for a leave",
+        "answer": "Submit a leave application form through the student portal at least 3 days in advance for planned leaves."
+      },
+      {
+        "question": "What is the attendance requirement",
+        "answer": "Minimum 75% attendance is mandatory in each subject to appear for end-semester examinations."
+      },
+      {
+        "question": "How can I access my academic records",
+        "answer": "Log in to the student portal and navigate to the 'Academic Records' section to view and download your records."
+      },
+      {
+        "question": "What is my attendance this semester",
+        "answer": "Currently Your Attendace is 92 %"
+      },
+      {
+        "question": "What are my pending assignments",
+        "answer": "Currently You have 2 pending assignments"
+      },
+      {
+        "last_updated": "2025-06-03T09:22:10+05:30",
+        "student_id": "STU2025001",
+        "academic_year": "2024-2025",
+        "semester": "4",
+        "attendance": {
+          "overall_percentage": 85.5,
+          "by_subject": [
+            {
+              "code": "AHP-002",
+              "name": "Engineering Chemistry",
+              "attended": 34,
+              "total": 40,
+              "percentage": 85.0
+            },
+            {
+              "code": "MEP-001",
+              "name": "Basic Mechanical Engg.",
+              "attended": 32,
+              "total": 40,
+              "percentage": 80.0
+            },
+            {
+              "code": "ECT-001",
+              "name": "Basic Electronic Engg.",
+              "attended": 32,
+              "total": 40,
+              "percentage": 80.0
+            }
+          ],
+          "last_updated": "2025-05-30"
+        },
+        "assignments": {
+          "pending": [
+            {
+              "code": "ECT-001",
+              "title": "Diode Applications",
+              "due_date": "2025-05-02",
+              "status": "pending",
+              "subject": "Electronics"
+            },
+            {
+              "code": "AHP-005",
+              "title": "Functions of Complex Variables",
+              "due_date": "2025-05-02",
+              "status": "pending",
+              "subject": "Analytical Mathematics"
+            }
+          ],
+          "submitted": [
+            {
+              "code": "MEP-001",
+              "title": "CO-Planner Forces System",
+              "submission_date": "2025-05-28",
+              "status": "submitted",
+              "subject": "Basic Mechanical Engineering"
+            }
+          ],
+          "graded": [
+            {
+              "code": "MEP-001",
+              "title": "Thermodynamics",
+              "submission_date": "2025-05-28",
+              "status": "graded",
+              "subject": "Basic Mechanical Engineering"
+            },
+            {
+              "code": "ECT-001",
+              "title": "Field Effect Transistors",
+              "submission_date": "2025-05-28",
+              "status": "graded",
+              "subject": "Basic Electronic Engineering"
+            }
+          ]
+        },
+        "grades": {
+          "current_semester": {
+            "subjects": [
+              {
+                "code": "AHP-005",
+                "name": "Analytical Mathematics",
+                "internal_marks": 41,
+                "internal_max": 50,
+                "assignment_marks": 18,
+                "assignment_max": 20
+              },
+              {
+                "code": "AHP-002",
+                "name": "Engineering Chemistry",
+                "internal_marks": 39,
+                "internal_max": 50,
+                "assignment_marks": 19,
+                "assignment_max": 20
+              },
+              {
+                "code": "MEP-001",
+                "name": "Basic Mechanical Engg.",
+                "internal_marks": 35,
+                "internal_max": 50,
+                "assignment_marks": 14,
+                "assignment_max": 20
+              },
+              {
+                "code": "ECT-001",
+                "name": "Basic Electronic Engg.",
+                "internal_marks": 42,
+                "internal_max": 50,
+                "assignment_marks": 17,
+                "assignment_max": 20
+              }
+            ]
+          },
+          "previous_semesters": [
+            {
+              "semester": "1",
+              "gpa": 4.625,
+              "subjects": [
+                {
+                  "code": "AHP-001",
+                  "name": "Appiled Mathematics",
+                  "grade": "A",
+                  "credits": 4
+                },
+                {
+                  "code": "AHP-003",
+                  "name": "Engineering Physics",
+                  "grade": "A+",
+                  "credits": 5
+                },
+                {
+                  "code": "EET-001",
+                  "name": "Basic Electrical Engg.",
+                  "grade": "A",
+                  "credits": 4.5
+                },
+                {
+                  "code": "CSP-002",
+                  "name": "C Programming",
+                  "grade": "A+",
+                  "credits": 5
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }

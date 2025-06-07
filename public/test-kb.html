@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Base Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-case {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .query {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .response {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: #e74c3c;
+        }
+        .success {
+            color: #27ae60;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Knowledge Base Test</h1>
+    <div id="test-results">
+        <p>Loading knowledge base and running tests...</p>
+    </div>
+
+    <script type="module">
+        // Import the knowledge base
+        import knowledgeBase from '/src/services/knowledgeBase.js';
+
+        // Test queries
+        const testQueries = [
+            'What are the library hours?',
+            'When is the computer lab open?',
+            'Where can I eat on campus?',
+            'How do I apply for financial aid?',
+            'When is the next career fair?',
+            'Hello!',
+            'Goodbye!',
+            'Thanks for your help!'
+        ];
+
+        async function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = ''; // Clear loading message
+
+            for (const query of testQueries) {
+                const testDiv = document.createElement('div');
+                testDiv.className = 'test-case';
+                
+                const queryDiv = document.createElement('div');
+                queryDiv.className = 'query';
+                queryDiv.textContent = `❓ ${query}`;
+                
+                const responseDiv = document.createElement('div');
+                responseDiv.className = 'response';
+                responseDiv.textContent = 'Testing...';
+                
+                testDiv.appendChild(queryDiv);
+                testDiv.appendChild(responseDiv);
+                resultsDiv.appendChild(testDiv);
+
+                try {
+                    const start = performance.now();
+                    const response = await knowledgeBase.query(query);
+                    const time = (performance.now() - start).toFixed(2);
+                    
+                    responseDiv.innerHTML = `
+                        <div class="success">✅ Success (${time}ms)</div>
+                        <div>${response.replace(/\n/g, '<br>')}</div>
+                    `;
+                } catch (error) {
+                    responseDiv.innerHTML = `
+                        <div class="error">❌ Error: ${error.message}</div>
+                    `;
+                    console.error('Test failed for query:', query, error);
+                }
+            }
+
+
+            // Add a completion message
+            const completionMsg = document.createElement('div');
+            completionMsg.className = 'test-case success';
+            completionMsg.textContent = '✨ All tests completed!';
+            resultsDiv.appendChild(completionMsg);
+        }
+
+        // Run tests when the page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>
