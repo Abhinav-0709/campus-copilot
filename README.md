@@ -34,3 +34,5 @@ CampusCopilot is an AI-powered college assistant designed to help students and f
    ```bash
    git clone https://github.com/yourusername/campus-copilot.git
    cd campus-copilot
+2. To run
+   run npm install and then npm run dev
