@@ -1,59 +1,98 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit } from '@/lib/rate-limiter';
+import { AttendanceSchema } from '@/lib/validators';
+import { getAuthSession, authorizeRole } from '@/lib/auth-guard';
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const studentId = searchParams.get('studentId');
+    const rateCheck = checkRateLimit(req, 'attendance_get', { limit: 60 });
+    if (!rateCheck.isAllowed) return rateCheck.response!;
 
-    if (!studentId) {
-      return NextResponse.json({ error: 'studentId param is required' }, { status: 400 });
+    const session = await getAuthSession(req);
+    const { searchParams } = new URL(req.url);
+    const requestedStudentId = searchParams.get('studentId');
+    const courseId = searchParams.get('courseId');
+
+    let whereClause: any = {};
+
+    if (session?.role === 'student') {
+      // Find exact student ID for authenticated profile
+      const student = await prisma.student.findUnique({
+        where: { profileId: session.userId },
+      });
+      if (!student) {
+        return NextResponse.json({ attendance: [] });
+      }
+      // Strictly enforce ownership: student can ONLY read their own attendance
+      whereClause.studentId = student.id;
+      if (courseId) whereClause.courseId = courseId;
+    } else {
+      // Faculty/Admin
+      if (requestedStudentId) whereClause.studentId = requestedStudentId;
+      if (courseId) whereClause.courseId = courseId;
     }
 
-    const attendances = await prisma.attendance.findMany({
-      where: { studentId },
-      include: { course: true },
+    const attendance = await prisma.attendance.findMany({
+      where: whereClause,
+      include: {
+        course: { select: { code: true, name: true } },
+      },
       orderBy: { date: 'desc' },
     });
 
-    // Group attendance metrics by course
-    const courseStatsMap: Record<string, { name: string; code: string; present: number; total: number }> = {};
-
-    attendances.forEach((record) => {
-      const courseId = record.courseId;
-      if (!courseStatsMap[courseId]) {
-        courseStatsMap[courseId] = {
-          name: record.course.name,
-          code: record.course.code,
-          present: 0,
-          total: 0,
-        };
-      }
-      courseStatsMap[courseId].total += 1;
-      if (record.status === 'present') {
-        courseStatsMap[courseId].present += 1;
-      }
-    });
-
-    const subjects = Object.values(courseStatsMap).map((item) => ({
-      name: item.name,
-      code: item.code,
-      present: item.present,
-      total: item.total,
-      percentage: item.total > 0 ? Math.round((item.present / item.total) * 100) : 100,
-    }));
-
-    const totalClasses = subjects.reduce((sum, s) => sum + s.total, 0);
-    const totalPresent = subjects.reduce((sum, s) => sum + s.present, 0);
-    const overallPercentage = totalClasses > 0 ? Math.round((totalPresent / totalClasses) * 100) : 100;
-
-    return NextResponse.json({
-      overall: overallPercentage,
-      subjects,
-      recent: attendances.slice(0, 10),
-    });
+    return NextResponse.json({ attendance });
   } catch (error: any) {
-    console.error('Attendance API Error:', error);
+    console.error('Attendance GET Error:', error);
     return NextResponse.json({ error: 'Failed to fetch attendance' }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const rateCheck = checkRateLimit(req, 'attendance_post', { limit: 30 });
+    if (!rateCheck.isAllowed) return rateCheck.response!;
+
+    const session = await getAuthSession(req);
+    const authCheck = authorizeRole(session, ['faculty', 'admin']);
+    if (!authCheck.isAuthorized) return authCheck.response!;
+
+    const body = await req.json();
+    const validation = AttendanceSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid attendance payload', details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
+    const { studentId, courseId, date, status, markedBy } = validation.data;
+
+    const record = await prisma.attendance.upsert({
+      where: {
+        studentId_courseId_date: {
+          studentId,
+          courseId,
+          date: new Date(date),
+        },
+      },
+      update: { status, markedBy: markedBy || session?.name || 'Faculty' },
+      create: {
+        studentId,
+        courseId,
+        date: new Date(date),
+        status,
+        markedBy: markedBy || session?.name || 'Faculty',
+      },
+    });
+
+    return NextResponse.json({ success: true, record });
+  } catch (error: any) {
+    console.error('Attendance POST Error:', error);
+    return NextResponse.json(
+      { error: process.env.NODE_ENV === 'production' ? 'Failed to record attendance' : error.message },
+      { status: 500 }
+    );
   }
 }

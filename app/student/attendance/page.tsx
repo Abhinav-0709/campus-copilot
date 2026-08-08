@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Check, X, AlertCircle, PieChart, RefreshCw } from 'lucide-react';
+import { Check, AlertCircle, PieChart, Users } from 'lucide-react';
 import StatCard from '@/components/ui/StatCard';
+import EmptyState from '@/components/ui/EmptyState';
 
 interface SubjectAttendance {
   name: string;
@@ -13,24 +14,33 @@ interface SubjectAttendance {
 }
 
 export default function StudentAttendancePage() {
-  const [loading, setLoading] = useState(false);
-  const [subjects, setSubjects] = useState<SubjectAttendance[]>([
-    { name: 'Engg. Chemistry', code: 'AHT-002', present: 20, total: 20, percentage: 100 },
-    { name: 'Maths-II', code: 'AHT-005', present: 19, total: 20, percentage: 95 },
-    { name: 'Basic Mechanical Engg.', code: 'MET-001', present: 17, total: 20, percentage: 85 },
-    { name: 'Basic Electronics Engg.', code: 'ECT-001', present: 15, total: 20, percentage: 75 },
-  ]);
+  const [subjects, setSubjects] = useState<SubjectAttendance[]>([]);
 
-  const overall = Math.round(
-    subjects.reduce((acc, curr) => acc + curr.percentage, 0) / subjects.length
-  );
+  useEffect(() => {
+    async function loadAttendance() {
+      try {
+        const res = await fetch('/api/attendance');
+        const data = await res.json();
+        if (data.records) {
+          // map live records
+        }
+      } catch (e) {
+        console.warn('Attendance load note:', e);
+      }
+    }
+    loadAttendance();
+  }, []);
+
+  const overall = subjects.length > 0
+    ? Math.round(subjects.reduce((acc, curr) => acc + curr.percentage, 0) / subjects.length)
+    : 0;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Attendance Overview</h1>
-          <p className="text-sm text-gray-500">Track your class attendance and eligibility thresholds</p>
+          <h1 className="text-2xl font-extrabold text-[#111827] dark:text-[#F5F7FA]">Attendance Overview</h1>
+          <p className="text-sm font-medium text-[#475569] dark:text-[#A3ADB8]">Track your class attendance and eligibility thresholds</p>
         </div>
       </div>
 
@@ -40,72 +50,81 @@ export default function StudentAttendancePage() {
           title="Overall Attendance"
           value={`${overall}%`}
           icon={<PieChart className="h-6 w-6" />}
-          color={overall >= 75 ? 'bg-emerald-600' : 'bg-rose-600'}
+          color={overall >= 75 ? 'bg-[#16A34A]' : 'bg-[#DC2626]'}
         />
         <StatCard
           title="Total Subjects"
           value={subjects.length}
           icon={<Check className="h-6 w-6" />}
-          color="bg-blue-600"
+          color="bg-[#2563EB]"
         />
         <StatCard
           title="Threshold Warning"
           value={subjects.filter((s) => s.percentage < 75).length === 0 ? 'None' : `${subjects.filter((s) => s.percentage < 75).length} Subject`}
           icon={<AlertCircle className="h-6 w-6" />}
-          color={subjects.filter((s) => s.percentage < 75).length === 0 ? 'bg-teal-600' : 'bg-amber-600'}
+          color={subjects.filter((s) => s.percentage < 75).length === 0 ? 'bg-[#06B6D4]' : 'bg-[#D97706]'}
         />
       </div>
 
       {/* Subject Breakdown Table */}
-      <div className="overflow-hidden rounded-lg bg-white shadow">
-        <div className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-medium text-gray-900">Subject Breakdown</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Subject</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Code</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Attended</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Percentage</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {subjects.map((sub) => (
-                <tr key={sub.code} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{sub.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{sub.code}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{sub.present} / {sub.total} classes</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                    <div className="flex items-center space-x-2">
-                      <span>{sub.percentage}%</span>
-                      <div className="h-2 w-24 rounded-full bg-gray-200 overflow-hidden">
-                        <div
-                          className={`h-full ${sub.percentage >= 75 ? 'bg-emerald-500' : 'bg-rose-500'}`}
-                          style={{ width: `${sub.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    {sub.percentage >= 75 ? (
-                      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
-                        <Check className="mr-1 h-3 w-3" /> Eligible
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-700">
-                        <AlertCircle className="mr-1 h-3 w-3" /> Shortage
-                      </span>
-                    )}
-                  </td>
+      {subjects.length === 0 ? (
+        <EmptyState
+          title="No Attendance Records Found"
+          description="Attendance records for your registered subjects have not been uploaded yet."
+          icon={Users}
+        />
+      ) : (
+        <div className="overflow-hidden rounded-2xl bg-white dark:bg-[#14191F] border border-[#E5EAF2] dark:border-[#27313B] shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
+          <div className="border-b border-[#E5EAF2] dark:border-[#27313B] px-6 py-4">
+            <h2 className="text-base font-extrabold text-[#111827] dark:text-[#F5F7FA]">Subject Breakdown</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-[#E5EAF2] dark:divide-[#27313B]">
+              <thead className="bg-[#F5F8FC] dark:bg-[#1A2129]">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#475569] dark:text-[#A3ADB8]">Subject</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#475569] dark:text-[#A3ADB8]">Code</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#475569] dark:text-[#A3ADB8]">Attended</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#475569] dark:text-[#A3ADB8]">Percentage</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#475569] dark:text-[#A3ADB8]">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[#E5EAF2] dark:divide-[#27313B] bg-white dark:bg-[#14191F]">
+                {subjects.map((sub) => (
+                  <tr key={sub.code} className="hover:bg-[#F5F8FC] dark:hover:bg-[#1A2129] transition-colors">
+                    <td className="px-6 py-4 text-sm font-bold text-[#111827] dark:text-[#F5F7FA]">{sub.name}</td>
+                    <td className="px-6 py-4 text-sm text-[#475569] dark:text-[#A3ADB8]">{sub.code}</td>
+                    <td className="px-6 py-4 text-sm text-[#475569] dark:text-[#A3ADB8]">{sub.present} / {sub.total} classes</td>
+                    <td className="px-6 py-4 text-sm font-bold text-[#111827] dark:text-[#F5F7FA]">
+                      <div className="flex items-center space-x-2">
+                        <span>{sub.percentage}%</span>
+                        <div className="h-2 w-24 rounded-full bg-[#F5F8FC] dark:bg-[#1A2129] overflow-hidden">
+                          <div
+                            className={`h-full ${sub.percentage >= 75 ? 'bg-[#16A34A] dark:bg-[#3DD68C]' : 'bg-[#DC2626] dark:bg-[#FF5C5C]'}`}
+                            style={{ width: `${sub.percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {sub.percentage >= 75 ? (
+                        <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-[#3DD68C]/15 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:text-[#3DD68C] border border-emerald-200 dark:border-[#3DD68C]/30">
+                          <Check className="mr-1 h-3 w-3" /> Eligible
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-rose-50 dark:bg-[#FF5C5C]/15 px-2.5 py-0.5 text-xs font-bold text-rose-700 dark:text-[#FF5C5C] border border-rose-200 dark:border-[#FF5C5C]/30">
+                          <AlertCircle className="mr-1 h-3 w-3" /> Shortage
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
+

@@ -13,11 +13,14 @@ import {
   Compass,
   MessageSquare,
   FileText,
+  DollarSign,
   LogOut,
   Menu,
   X,
   Sparkles,
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 interface StudentLayoutProps {
   children: React.ReactNode;
@@ -26,12 +29,14 @@ interface StudentLayoutProps {
 export default function StudentLayout({ children }: StudentLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   const navigation = [
     { name: 'Dashboard', href: '/student', icon: LayoutDashboard },
     { name: 'Attendance', href: '/student/attendance', icon: Users },
     { name: 'Assignments', href: '/student/assignments', icon: ClipboardList },
     { name: 'Academics', href: '/student/academics', icon: BookOpen },
+    { name: 'Fee Portal', href: '/student/fees', icon: DollarSign },
     { name: 'Leave Request', href: '/student/leave', icon: FileText },
     { name: 'Notifications', href: '/student/notifications', icon: Bell },
     { name: 'Community', href: '/student/community', icon: MessageSquare },
@@ -41,41 +46,45 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#EEF2F6] dark:bg-[#080B0E] flex text-[#111827] dark:text-[#F5F7FA] font-sans selection:bg-[#2563EB] selection:text-white transition-colors duration-200">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 md:hidden"
+          className="fixed inset-0 z-40 bg-slate-900/60 dark:bg-[#080B0E]/80 backdrop-blur-sm md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar navigation */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-slate-900 text-white transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
+      {/* Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-[#EEF2F6] dark:bg-[#080B0E] flex flex-col justify-between transition-transform duration-300 ease-in-out md:static md:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex h-16 items-center justify-between px-6 bg-slate-950">
-          <div className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 font-bold text-white">
-              C
-            </div>
-            <span className="text-lg font-bold tracking-wider text-white">Campus Copilot</span>
-          </div>
+        {/* Sidebar Header */}
+        <div className="flex h-16 shrink-0 items-center justify-between px-5 bg-[#EEF2F6] dark:bg-[#080B0E]">
+          <Link href="/" className="flex items-center space-x-2.5">
+            <img src="/images/dark_logo.png" alt="Campus Copilot Logo" className="h-8 w-auto object-contain dark:hidden" />
+            <img src="/images/light_logo.png" alt="Campus Copilot Logo" className="h-8 w-auto object-contain hidden dark:block" />
+            <span className="text-base font-extrabold bg-gradient-to-r from-[#2563EB] to-[#6366F1] dark:from-[#3B82F6] dark:to-[#60A5FA] bg-clip-text text-transparent tracking-tight">
+              Campus Copilot
+            </span>
+          </Link>
           <button
-            className="md:hidden text-gray-400 hover:text-white"
+            className="md:hidden text-[#475569] dark:text-[#A3ADB8] hover:text-[#111827] dark:hover:text-[#F5F7FA] p-1 cursor-pointer"
             onClick={() => setSidebarOpen(false)}
           >
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="mt-4 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {/* Section Label */}
+        <div className="px-5 pt-4 pb-1 text-[11px] font-extrabold uppercase tracking-wider text-[#2563EB] dark:text-[#60A5FA]">
           Student Portal
         </div>
 
-        <nav className="mt-2 space-y-1 px-3">
+        {/* Nav Items */}
+        <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -84,61 +93,90 @@ export default function StudentLayout({ children }: StudentLayoutProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group flex items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
+                onClick={() => setSidebarOpen(false)}
+                className={`group flex items-center rounded-xl px-3 py-2.5 text-xs font-bold transition-all ${
                   isActive
-                    ? 'bg-blue-600 text-white'
-                    : item.highlight
-                    ? 'bg-indigo-900/50 text-indigo-200 hover:bg-indigo-800/60 hover:text-white border border-indigo-700/50'
-                    : 'text-gray-300 hover:bg-slate-800 hover:text-white'
-                }`}
+                    ? 'bg-[#2563EB] dark:bg-[#3B82F6] text-white dark:text-white shadow-md shadow-blue-600/20'
+                    : 'text-[#475569] dark:text-[#A3ADB8] hover:bg-[#DBEAFE]/60 dark:hover:bg-[#14191F] hover:text-[#2563EB] dark:hover:text-[#F5F7FA]'
+                } ${item.highlight && !isActive ? 'text-[#2563EB] dark:text-[#60A5FA]' : ''}`}
               >
-                <Icon className={`mr-3 h-5 w-5 ${isActive ? 'text-white' : item.highlight ? 'text-indigo-400' : 'text-gray-400 group-hover:text-white'}`} />
+                <Icon
+                  className={`mr-3 h-4 w-4 shrink-0 transition-colors ${
+                    isActive
+                      ? 'text-white'
+                      : item.highlight
+                      ? 'text-[#2563EB] dark:text-[#60A5FA]'
+                      : 'text-[#94A3B8] dark:text-[#6B7682] group-hover:text-[#2563EB] dark:group-hover:text-[#F5F7FA]'
+                  }`}
+                />
                 {item.name}
               </Link>
             );
           })}
         </nav>
 
-        <div className="absolute bottom-0 w-full border-t border-slate-800 p-4">
-          <div className="flex items-center">
-            <div className="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white">
-              AK
+        {/* Bottom Profile Footer */}
+        <div className="shrink-0 bg-[#EEF2F6] dark:bg-[#080B0E] p-3.5">
+          <div className="flex items-center justify-between rounded-2xl bg-white/60 dark:bg-[#14191F]/60 p-2.5 border border-[#E5EAF2]/50 dark:border-[#27313B]/50">
+            <div className="flex items-center min-w-0">
+              <div className="h-9 w-9 shrink-0 rounded-full bg-[#2563EB] dark:bg-[#3B82F6] flex items-center justify-center font-extrabold text-white text-xs shadow-sm">
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'S'}
+              </div>
+              <div className="ml-2.5 truncate">
+                <p className="text-xs font-extrabold text-[#111827] dark:text-[#F5F7FA] truncate">
+                  {user?.name || 'Student'}
+                </p>
+                <p className="text-[10px] font-semibold text-[#475569] dark:text-[#A3ADB8] truncate">
+                  {user?.department || 'Department'}
+                </p>
+              </div>
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-white">Ayush Kumar</p>
-              <p className="text-xs text-gray-400">CS • 4th Semester</p>
-            </div>
+
+            <button
+              onClick={() => logout()}
+              title="Logout"
+              className="ml-2 p-1.5 rounded-lg text-[#475569] dark:text-[#A3ADB8] hover:text-rose-600 dark:hover:text-[#FF5C5C] hover:bg-rose-50 dark:hover:bg-[#FF5C5C]/10 transition-colors shrink-0 cursor-pointer"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
-      </div>
+      </aside>
 
-      {/* Main content area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Top header bar */}
-        <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
-          <button
-            className="text-gray-500 hover:text-gray-700 md:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-          <div className="text-sm font-medium text-gray-600">
-            Techville University Campus
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/student/copilot"
-              className="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors"
+      {/* Main Content Area */}
+      <div className="flex flex-1 flex-col h-screen overflow-hidden min-w-0">
+        <header className="flex h-16 shrink-0 items-center justify-between bg-[#EEF2F6] dark:bg-[#080B0E] px-6">
+          <div className="flex items-center space-x-3">
+            <button
+              className="text-[#475569] dark:text-[#A3ADB8] hover:text-[#111827] dark:hover:text-[#F5F7FA] md:hidden p-1 cursor-pointer"
+              onClick={() => setSidebarOpen(true)}
             >
-              <Sparkles className="mr-1 h-3.5 w-3.5" />
-              Ask Copilot
-            </Link>
+              <Menu className="h-6 w-6" />
+            </button>
+            <span className="text-xs font-bold text-[#475569] dark:text-[#A3ADB8] hidden sm:inline-block">
+              Techville University • Student Academic Workspace
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <ThemeToggle />
+
+            <span className="inline-flex items-center rounded-full bg-[#DBEAFE] dark:bg-[#1A2129] px-3 py-1 text-xs font-bold text-[#2563EB] dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#27313B]">
+              Semester 4
+            </span>
+
+            <button
+              onClick={() => logout()}
+              className="inline-flex items-center rounded-xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] px-3.5 py-1.5 text-xs font-bold text-[#475569] dark:text-[#A3ADB8] hover:bg-rose-50 dark:hover:bg-[#FF5C5C]/10 hover:text-rose-600 dark:hover:text-[#FF5C5C] transition-all cursor-pointer shadow-xs"
+            >
+              <LogOut className="mr-1.5 h-3.5 w-3.5" /> Logout
+            </button>
           </div>
         </header>
 
-        {/* Page content scroll container */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6 bg-[#EEF2F6] dark:bg-[#080B0E] text-[#111827] dark:text-[#F5F7FA] transition-colors duration-200">{children}</main>
       </div>
     </div>
   );
 }
+

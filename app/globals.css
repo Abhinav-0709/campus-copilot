@@ -1,11 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #f9fafb;
+  /* Light Theme (Dull Cool Slate Shell with White Cards) */
+  --bg-base: #EEF2F6;
+  --bg-soft: #EEF2F6;
+  --bg-surface: #FFFFFF;
+  --bg-surface-soft: #F5F8FC;
+  --border-subtle: #E5EAF2;
+
+  --accent-primary: #2563EB;
+  --accent-electric: #3B82F6;
+  --accent-light: #60A5FA;
+  --accent-pale: #DBEAFE;
+  --accent-violet: #6366F1;
+  --accent-purple: #7C3AED;
+  --accent-cyan: #06B6D4;
+
+  --text-primary: #111827;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  --semantic-success: #16A34A;
+  --semantic-danger: #DC2626;
+  --semantic-warn: #D97706;
+
+  --background: #EEF2F6;
   --foreground: #111827;
+
+  --card-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+  --card-shadow-hover: 0 20px 40px rgba(37, 99, 235, 0.12);
+}
+
+.dark {
+  /* Dark Theme (Dull Midnight Shell with Charcoal Cards) */
+  --bg-base: #080B0E;
+  --bg-soft: #080B0E;
+  --bg-surface: #14191F;
+  --bg-surface-soft: #1A2129;
+  --border-subtle: #27313B;
+
+  --accent-primary: #3B82F6;
+  --accent-electric: #60A5FA;
+  --accent-light: #93C5FD;
+  --accent-pale: #1E293B;
+  --accent-violet: #818CF8;
+  --accent-purple: #A78BFA;
+  --accent-cyan: #22D3EE;
+
+  --text-primary: #F5F7FA;
+  --text-secondary: #A3ADB8;
+  --text-muted: #6B7682;
+  --text-inverse: #FFFFFF;
+
+  --semantic-success: #3DD68C;
+  --semantic-danger: #FF5C5C;
+  --semantic-warn: #E8D44D;
+
+  --background: #080B0E;
+  --foreground: #F5F7FA;
+
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --card-shadow-hover: 0 20px 40px rgba(59, 130, 246, 0.15);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+/* Aurora Theme Cards */
+.aurora-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aurora-card:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Surface Soft Container */
+.aurora-surface-soft {
+  background-color: var(--bg-surface-soft);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Primary Button with Blue Glow */
+.aurora-btn-primary {
+  background-color: #2563EB;
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.aurora-btn-primary:hover {
+  background-color: #1D4ED8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+}
+
+/* Main Conversion CTA Gradient Button */
+.aurora-btn-gradient {
+  background: linear-gradient(135deg, #2563EB 0%, #6366F1 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+}
+
+.aurora-btn-gradient:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* Top-to-Bottom Drop Curtain Theme Transition */
+@keyframes themeDropCurtain {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0.98;
+  }
+  55% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+}
+
+.animate-theme-drop-curtain {
+  animation: themeDropCurtain 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

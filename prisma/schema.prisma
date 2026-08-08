@@ -53,6 +53,7 @@ model Student {
   attendances Attendance[]
   grades      Grade[]
   submissions Submission[]
+  feeRecords  FeeRecord[]
 
   @@map("students")
 }
@@ -334,4 +335,72 @@ model ChatMessage {
 enum MessageRole {
   user
   assistant
+}
+
+// ─── RAG AI Knowledge Base & Vector Store ─────────────────────────────────────
+
+model KnowledgeDocument {
+  id         String   @id @default(uuid())
+  title      String
+  category   String?
+  sourceType String   @default("text")
+  chunkCount Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  chunks DocumentChunk[]
+
+  @@map("knowledge_documents")
+}
+
+model DocumentChunk {
+  id         String   @id @default(uuid())
+  documentId String
+  content    String
+  metadata   String?
+  embedding  Float[]
+
+  document KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("document_chunks")
+}
+
+// ─── Fee Management System ───────────────────────────────────────────────────
+
+model FeeRecord {
+  id          String    @id @default(uuid())
+  studentId   String
+  semester    Int
+  tuitionFee  Float
+  hostelFee   Float     @default(0)
+  examFee     Float     @default(0)
+  totalAmount Float
+  status      FeeStatus @default(pending)
+  dueDate     DateTime
+  paidAt      DateTime?
+  receiptUrl  String?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("fee_records")
+}
+
+enum FeeStatus {
+  pending
+  paid
+  overdue
+}
+
+// ─── Audit Logging System ────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String
+  action     String
+  resource   String
+  resourceId String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_logs")
 }

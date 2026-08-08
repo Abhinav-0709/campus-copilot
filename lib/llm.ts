@@ -17,27 +17,21 @@ const getProvider = (): LLMProvider => {
   return 'gemini';
 };
 
-/**
- * Initialize Gemini Client using @google/genai SDK
- */
+// ─── Gemini Setup ─────────────────────────────────────────────────────────────
 function getGeminiClient() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY environment variable is missing');
   return new GoogleGenAI({ apiKey });
 }
 
-/**
- * Initialize Groq Client using groq-sdk
- */
+// ─── Groq Setup ───────────────────────────────────────────────────────────────
 function getGroqClient() {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error('GROQ_API_KEY environment variable is missing');
   return new Groq({ apiKey });
 }
 
-/**
- * Initialize Ollama Client using ollama SDK
- */
+// ─── Ollama Setup ─────────────────────────────────────────────────────────────
 function getOllamaClient() {
   const host = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
   return new Ollama({ host });
@@ -140,8 +134,7 @@ export async function generateEmbeddings(text: string): Promise<number[]> {
         contents: text,
       });
 
-      const resAny = response as any;
-      return resAny.embedding?.values || resAny.embeddings?.[0]?.values || [];
+      return response.embeddings?.[0]?.values || [];
     }
 
     if (provider === 'ollama') {
@@ -163,8 +156,7 @@ export async function generateEmbeddings(text: string): Promise<number[]> {
       contents: text,
     });
 
-    const resAny = response as any;
-    return resAny.embedding?.values || resAny.embeddings?.[0]?.values || [];
+    return response.embeddings?.[0]?.values || [];
   } catch (error) {
     console.error(`[Embedding Error] Provider: ${provider}`, error);
     throw error;

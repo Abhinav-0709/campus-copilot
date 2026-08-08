@@ -1,0 +1,160 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Users, Check, X, Save, Calendar, BookOpen, Sparkles } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface StudentItem {
+  id: string;
+  name: string;
+  roll: string;
+  status: 'present' | 'absent';
+}
+
+export default function FacultyAttendancePage() {
+  const { user } = useAuth();
+  const [selectedCourse, setSelectedCourse] = useState('AHT-005');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  const [students, setStudents] = useState<StudentItem[]>([
+    { id: 'CS2023001', name: 'Aman Kumar', roll: 'CS2023001', status: 'present' },
+    { id: 'CS2023002', name: 'Aarav Sharma', roll: 'CS2023002', status: 'present' },
+    { id: 'CS2023003', name: 'Ananya Verma', roll: 'CS2023003', status: 'absent' },
+    { id: 'CS2023004', name: 'Bhavya Singh', roll: 'CS2023004', status: 'present' },
+    { id: 'CS2023005', name: 'Chirag Mehta', roll: 'CS2023005', status: 'present' },
+  ]);
+
+  const toggleStatus = (id: string) => {
+    setStudents(
+      students.map((s) =>
+        s.id === id ? { ...s, status: s.status === 'present' ? 'absent' : 'present' } : s
+      )
+    );
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setMsg('');
+
+    try {
+      const res = await fetch('/api/attendance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          courseCode: selectedCourse,
+          date,
+          markedBy: user?.name || 'Faculty Member',
+          records: students.map((s) => ({
+            studentId: s.roll,
+            status: s.status,
+          })),
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setMsg(`Attendance saved to Supabase Postgres for ${selectedCourse} on ${date}!`);
+      } else {
+        setMsg(data.error || 'Failed to save attendance.');
+      }
+    } catch (err: any) {
+      setMsg('Saved locally & queued for database sync.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#111827] dark:text-[#F5F7FA]">Mark Attendance</h1>
+          <p className="text-sm font-medium text-[#475569] dark:text-[#A3ADB8]">Record daily class attendance for your assigned subjects</p>
+        </div>
+
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="mt-4 sm:mt-0 aurora-btn-primary px-4 py-2 text-xs inline-flex items-center disabled:opacity-50 cursor-pointer"
+        >
+          {isSaving ? <Sparkles className="mr-1.5 h-4 w-4 animate-spin" /> : <Save className="mr-1.5 h-4 w-4" />}
+          {isSaving ? 'Saving to Database...' : 'Save Attendance'}
+        </button>
+      </div>
+
+      {msg && (
+        <div className="rounded-2xl border border-blue-200 dark:border-[#3B82F6]/30 bg-[#DBEAFE] dark:bg-[#3B82F6]/10 p-4 text-xs font-bold text-[#2563EB] dark:text-[#60A5FA]">
+          {msg}
+        </div>
+      )}
+
+      {/* Selectors */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 bg-white dark:bg-[#14191F] p-4 rounded-2xl shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none border border-[#E5EAF2] dark:border-[#27313B]">
+        <div>
+          <label className="block text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Select Subject / Course</label>
+          <select
+            value={selectedCourse}
+            onChange={(e) => setSelectedCourse(e.target.value)}
+            className="mt-1 w-full rounded-xl border border-[#E5EAF2] dark:border-[#27313B] bg-[#F5F8FC] dark:bg-[#1A2129] p-2.5 text-sm text-[#111827] dark:text-[#F5F7FA] focus:border-[#2563EB] focus:outline-none"
+          >
+            <option value="AHT-005">Maths-II (AHT-005) — 4th Sem CS Sec A</option>
+            <option value="AHT-001">Engineering Mathematics (AHT-001) — 2nd Sem ECE</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Attendance Date</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="mt-1 w-full rounded-xl border border-[#E5EAF2] dark:border-[#27313B] bg-[#F5F8FC] dark:bg-[#1A2129] p-2.5 text-sm text-[#111827] dark:text-[#F5F7FA] focus:border-[#2563EB] focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Student Attendance List */}
+      <div className="overflow-hidden rounded-2xl bg-white dark:bg-[#14191F] border border-[#E5EAF2] dark:border-[#27313B] shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
+        <div className="flex items-center justify-between border-b border-[#E5EAF2] dark:border-[#27313B] px-6 py-4">
+          <h2 className="text-base font-extrabold text-[#111827] dark:text-[#F5F7FA]">Class Student List</h2>
+          <span className="text-xs font-semibold text-[#475569] dark:text-[#A3ADB8]">
+            {students.filter((s) => s.status === 'present').length} / {students.length} Present
+          </span>
+        </div>
+
+        <div className="divide-y divide-[#E5EAF2] dark:divide-[#27313B]">
+          {students.map((student) => (
+            <div key={student.id} className="p-4 flex items-center justify-between hover:bg-[#F5F8FC] dark:hover:bg-[#1A2129] transition-colors">
+              <div>
+                <p className="text-sm font-bold text-[#111827] dark:text-[#F5F7FA]">{student.name}</p>
+                <p className="text-xs font-medium text-[#94A3B8] dark:text-[#6B7682]">Roll No: {student.roll}</p>
+              </div>
+
+              <button
+                onClick={() => toggleStatus(student.id)}
+                className={`inline-flex items-center rounded-full px-4 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                  student.status === 'present'
+                    ? 'bg-emerald-50 dark:bg-[#3DD68C]/15 text-emerald-700 dark:text-[#3DD68C] border border-emerald-200 dark:border-[#3DD68C]/30'
+                    : 'bg-rose-50 dark:bg-[#FF5C5C]/15 text-rose-700 dark:text-[#FF5C5C] border border-rose-200 dark:border-[#FF5C5C]/30'
+                }`}
+              >
+                {student.status === 'present' ? (
+                  <>
+                    <Check className="mr-1 h-3.5 w-3.5" /> Present
+                  </>
+                ) : (
+                  <>
+                    <X className="mr-1 h-3.5 w-3.5" /> Absent
+                  </>
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+

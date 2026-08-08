@@ -3,26 +3,10 @@
 import React, { useState } from 'react';
 import { Bell, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import EmptyState from '@/components/ui/EmptyState';
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState([
-    {
-      id: '1',
-      title: 'Leave Request Approved',
-      body: 'Your medical leave application for Aug 10 - Aug 12 has been approved by Faculty.',
-      type: 'leave_update',
-      date: '2026-08-08',
-      read: false,
-    },
-    {
-      id: '2',
-      title: 'Assignment Due Reminder',
-      body: 'Unit-5 Partial Differential Equations is due in 7 days.',
-      type: 'assignment_due',
-      date: '2026-08-07',
-      read: true,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const markAllRead = () => {
     setNotifications(notifications.map((n) => ({ ...n, read: true })));
@@ -32,49 +16,60 @@ export default function NotificationsPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-          <p className="text-sm text-gray-500">Stay updated on your coursework, leave requests, and announcements</p>
+          <h1 className="text-2xl font-extrabold text-[#111827] dark:text-[#F5F7FA]">Notifications</h1>
+          <p className="text-sm font-medium text-[#475569] dark:text-[#A3ADB8]">Stay updated on your coursework, leave requests, and announcements</p>
         </div>
         <button
           onClick={markAllRead}
-          className="text-xs font-semibold text-blue-600 hover:text-blue-500"
+          className="text-xs font-bold text-[#2563EB] dark:text-[#60A5FA] hover:underline cursor-pointer"
         >
           Mark all as read
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-lg bg-white shadow border border-gray-200 divide-y divide-gray-200">
-        {notifications.map((n) => (
-          <div
-            key={n.id}
-            className={`p-5 flex items-start space-x-4 transition-colors ${
-              n.read ? 'bg-white' : 'bg-blue-50/40'
-            }`}
-          >
+      {notifications.length === 0 ? (
+        <EmptyState
+          title="No Unread Notifications"
+          description="You're all caught up! There are no new notifications or course alerts at this time."
+          icon={Bell}
+        />
+      ) : (
+        <div className="overflow-hidden rounded-2xl bg-white dark:bg-[#14191F] border border-[#E5EAF2] dark:border-[#27313B] shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none divide-y divide-[#E5EAF2] dark:divide-[#27313B]">
+          {notifications.map((n) => (
             <div
-              className={`rounded-full p-2 text-white ${
-                n.type === 'leave_update'
-                  ? 'bg-emerald-500'
-                  : n.type === 'assignment_due'
-                  ? 'bg-amber-500'
-                  : 'bg-blue-500'
+              key={n.id}
+              className={`p-5 flex items-start space-x-4 transition-colors ${
+                n.read
+                  ? 'bg-white dark:bg-[#14191F]'
+                  : 'bg-[#DBEAFE]/40 dark:bg-[#1A2129]'
               }`}
             >
-              <Bell className="h-4 w-4" />
-            </div>
-
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold text-gray-900">{n.title}</h2>
-                <span className="text-xs text-gray-400">
-                  {format(new Date(n.date), 'MMM d, yyyy')}
-                </span>
+              <div
+                className={`rounded-full p-2 text-white shrink-0 ${
+                  n.type === 'leave_update'
+                    ? 'bg-[#16A34A] dark:bg-[#3DD68C]'
+                    : n.type === 'assignment_due'
+                    ? 'bg-[#D97706] dark:bg-[#E8D44D]'
+                    : 'bg-[#2563EB] dark:bg-[#3B82F6]'
+                }`}
+              >
+                <Bell className="h-4 w-4" />
               </div>
-              <p className="mt-1 text-xs text-gray-600 leading-relaxed">{n.body}</p>
+
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-bold text-[#111827] dark:text-[#F5F7FA]">{n.title}</h2>
+                  <span className="text-xs font-medium text-[#94A3B8] dark:text-[#6B7682]">
+                    {format(new Date(n.date), 'MMM d, yyyy')}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-medium text-[#475569] dark:text-[#A3ADB8] leading-relaxed">{n.body}</p>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
+
