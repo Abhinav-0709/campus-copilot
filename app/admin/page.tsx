@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, BookOpen, ShieldCheck, DollarSign, RefreshCw } from 'lucide-react';
 import StatCard from '@/components/ui/StatCard';
 import Link from 'next/link';
+import QuickActionsGrid from '@/components/dashboard/QuickActionsGrid';
 
 export default function AdminDashboardPage() {
   const [metrics, setMetrics] = useState({
@@ -69,10 +70,27 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Admin Quick Action Panels */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-7 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none space-y-4">
           <h2 className="text-lg font-bold text-[#111827] dark:text-[#F5F7FA] flex items-center">
-            <Users className="mr-2 h-5 w-5 text-[#2563EB] dark:text-[#60A5FA]" /> User Management & Roles
+            <BookOpen className="mr-2 h-5 w-5 text-[#2563EB] dark:text-[#60A5FA]" /> Academic Setup & Courses
+          </h2>
+          <p className="text-sm text-[#475569] dark:text-[#A3ADB8] leading-relaxed font-medium">
+            Create courses, assign faculty, enroll students into course sections, and construct class timetables.
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/admin/academic-setup"
+              className="aurora-btn-primary px-4 py-2.5 text-xs inline-flex items-center"
+            >
+              Open Academic Setup
+            </Link>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-7 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none space-y-4">
+          <h2 className="text-lg font-bold text-[#111827] dark:text-[#F5F7FA] flex items-center">
+            <Users className="mr-2 h-5 w-5 text-[#2563EB] dark:text-[#60A5FA]" /> User Directory
           </h2>
           <p className="text-sm text-[#475569] dark:text-[#A3ADB8] leading-relaxed font-medium">
             Manage user accounts, assign faculty employee IDs, update student roll numbers, and grant administrative access.
@@ -80,7 +98,7 @@ export default function AdminDashboardPage() {
           <div className="pt-2">
             <Link
               href="/admin/users"
-              className="aurora-btn-primary px-4 py-2.5 text-xs inline-flex items-center"
+              className="inline-flex items-center rounded-xl bg-white dark:bg-[#1A2129] border border-[#E5EAF2] dark:border-[#27313B] px-4 py-2.5 text-xs font-extrabold text-[#475569] dark:text-[#F5F7FA] hover:bg-[#F5F8FC] dark:hover:bg-[#27313B] transition-all shadow-xs"
             >
               Manage System Users
             </Link>
@@ -104,6 +122,8 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </div>
+
+      <QuickActionsGrid role="admin" />
     </div>
   );
 }

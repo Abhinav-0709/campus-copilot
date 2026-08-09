@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, Clock, RefreshCw, FileText } from 'lucide-react';
 import EmptyState from '@/components/ui/EmptyState';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LeaveItem {
   id: string;
@@ -16,6 +17,7 @@ interface LeaveItem {
 }
 
 export default function FacultyLeaveManagementPage() {
+  const { user } = useAuth();
   const [requests, setRequests] = useState<LeaveItem[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -89,7 +91,7 @@ export default function FacultyLeaveManagementPage() {
         body: JSON.stringify({
           id,
           status: newStatus,
-          reviewedBy: 'Dr. Vidit Vats',
+          reviewedBy: user?.name || 'Faculty Member',
         }),
       });
     } catch (e) {

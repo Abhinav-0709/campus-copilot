@@ -58,36 +58,52 @@ export async function POST(req: NextRequest) {
     if (!authCheck.isAuthorized) return authCheck.response!;
 
     const body = await req.json();
-    const validation = AttendanceSchema.safeParse(body);
 
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid attendance payload', details: validation.error.format() },
-        { status: 400 }
-      );
+    // Support both bulk records array and single item
+    let itemsToProcess: Array<{ studentId: string; courseId: string; date: string; status: 'present' | 'absent' | 'late'; markedBy?: string }> = [];
+
+    if (body.records && Array.isArray(body.records)) {
+      itemsToProcess = body.records.map((r: any) => ({
+        studentId: r.studentId,
+        courseId: r.courseId || body.courseId,
+        date: r.date || body.date,
+        status: r.status,
+        markedBy: body.markedBy || session?.name || 'Faculty',
+      }));
+    } else {
+      const validation = AttendanceSchema.safeParse(body);
+      if (!validation.success) {
+        return NextResponse.json(
+          { error: 'Invalid attendance payload', details: validation.error.format() },
+          { status: 400 }
+        );
+      }
+      itemsToProcess.push(validation.data);
     }
 
-    const { studentId, courseId, date, status, markedBy } = validation.data;
-
-    const record = await prisma.attendance.upsert({
-      where: {
-        studentId_courseId_date: {
-          studentId,
-          courseId,
-          date: new Date(date),
+    const results = [];
+    for (const item of itemsToProcess) {
+      const record = await prisma.attendance.upsert({
+        where: {
+          studentId_courseId_date: {
+            studentId: item.studentId,
+            courseId: item.courseId,
+            date: new Date(item.date),
+          },
         },
-      },
-      update: { status, markedBy: markedBy || session?.name || 'Faculty' },
-      create: {
-        studentId,
-        courseId,
-        date: new Date(date),
-        status,
-        markedBy: markedBy || session?.name || 'Faculty',
-      },
-    });
+        update: { status: item.status, markedBy: item.markedBy || session?.name || 'Faculty' },
+        create: {
+          studentId: item.studentId,
+          courseId: item.courseId,
+          date: new Date(item.date),
+          status: item.status,
+          markedBy: item.markedBy || session?.name || 'Faculty',
+        },
+      });
+      results.push(record);
+    }
 
-    return NextResponse.json({ success: true, record });
+    return NextResponse.json({ success: true, count: results.length, records: results });
   } catch (error: any) {
     console.error('Attendance POST Error:', error);
     return NextResponse.json(

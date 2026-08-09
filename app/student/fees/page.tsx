@@ -96,41 +96,42 @@ export default function StudentFeesPage() {
         </div>
       )}
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
-          <p className="text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Current Pending Dues</p>
-          <p className="text-3xl font-extrabold text-[#111827] dark:text-[#F5F7FA] mt-2">
-            ₹{fees.find((f) => f.status === 'pending')?.totalAmount.toLocaleString() || '0'}
-          </p>
-          <p className="text-[11px] font-semibold text-[#94A3B8] dark:text-[#6B7682] mt-1">Due by Aug 30, 2026</p>
-        </div>
+      {fees.length === 0 ? (
+        <EmptyState
+          title="No Fee Records Found"
+          description="There are currently no fee invoices or payment statements generated for your profile."
+          icon={DollarSign}
+        />
+      ) : (
+        <>
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
+              <p className="text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Current Pending Dues</p>
+              <p className="text-3xl font-extrabold text-[#111827] dark:text-[#F5F7FA] mt-2">
+                ₹{fees.find((f) => f.status === 'pending')?.totalAmount.toLocaleString() || '0'}
+              </p>
+              <p className="text-[11px] font-semibold text-[#94A3B8] dark:text-[#6B7682] mt-1">
+                {fees.find((f) => f.status === 'pending') ? `Due by ${fees.find((f) => f.status === 'pending')?.dueDate}` : 'No Pending Dues'}
+              </p>
+            </div>
 
-        <div className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
-          <p className="text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Total Fees Paid</p>
-          <p className="text-3xl font-extrabold text-[#16A34A] dark:text-[#3DD68C] mt-2">
-            ₹{fees.filter((f) => f.status === 'paid').reduce((sum, f) => sum + f.totalAmount, 0).toLocaleString()}
-          </p>
-          <p className="text-[11px] font-semibold text-[#94A3B8] dark:text-[#6B7682] mt-1">Cleared for previous sems</p>
-        </div>
+            <div className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
+              <p className="text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Total Fees Paid</p>
+              <p className="text-3xl font-extrabold text-[#16A34A] dark:text-[#3DD68C] mt-2">
+                ₹{fees.filter((f) => f.status === 'paid').reduce((sum, f) => sum + f.totalAmount, 0).toLocaleString()}
+              </p>
+              <p className="text-[11px] font-semibold text-[#94A3B8] dark:text-[#6B7682] mt-1">Cleared invoices</p>
+            </div>
 
-        <div className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
-          <p className="text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Scholarship Status</p>
-          <p className="text-xl font-extrabold text-[#2563EB] dark:text-[#60A5FA] mt-2">Merit 25% Active</p>
-          <p className="text-[11px] font-semibold text-[#94A3B8] dark:text-[#6B7682] mt-1">Applied on Tuition Fee</p>
-        </div>
-      </div>
-
-      {/* Fee List */}
-      <div className="space-y-4">
-        {fees.length === 0 ? (
-          <EmptyState
-            title="No Fee Records Found"
-            description="You have no pending or past fee statements for your profile."
-            icon={DollarSign}
-          />
-        ) : (
-          fees.map((f) => (
+            <div className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
+              <p className="text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Fee Records Count</p>
+              <p className="text-xl font-extrabold text-[#2563EB] dark:text-[#60A5FA] mt-2">{fees.length} Invoices</p>
+              <p className="text-[11px] font-semibold text-[#94A3B8] dark:text-[#6B7682] mt-1">Academic Statements</p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            {fees.map((f) => (
           <div key={f.id} className="rounded-2xl border border-[#E5EAF2] dark:border-[#27313B] bg-white dark:bg-[#14191F] p-7 shadow-[0_8px_30px_rgba(15,23,42,0.04)] dark:shadow-none">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#E5EAF2] dark:border-[#27313B] pb-5 mb-5">
               <div>
@@ -211,9 +212,11 @@ export default function StudentFeesPage() {
               </div>
             </div>
           </div>
-        )))}
+        ))}
       </div>
-    </div>
-  );
+    </>
+  )}
+</div>
+);
 }
 

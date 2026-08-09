@@ -6,6 +6,7 @@ import StatCard from '@/components/ui/StatCard';
 import EmptyState from '@/components/ui/EmptyState';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import QuickActionsGrid from '@/components/dashboard/QuickActionsGrid';
 
 export default function FacultyDashboard() {
   const { user } = useAuth();
@@ -14,15 +15,30 @@ export default function FacultyDashboard() {
 
   const [todayClasses, setTodayClasses] = useState<any[]>([]);
   const [pendingLeaves, setPendingLeaves] = useState<any[]>([]);
+  const [facultyStats, setFacultyStats] = useState({
+    totalStudents: 0,
+    activeCourses: 0,
+    assignmentsCreated: 0,
+  });
 
   useEffect(() => {
     async function loadFacultyData() {
       try {
-        const res = await fetch('/api/leave');
-        const data = await res.json();
-        if (data.leaveRequests) {
+        const [leaveRes, coursesRes, scheduleRes] = await Promise.all([
+          fetch('/api/leave'),
+          fetch('/api/faculty/courses'),
+          fetch('/api/faculty/schedule/today'),
+        ]);
+
+        const [leaveData, coursesData, scheduleData] = await Promise.all([
+          leaveRes.json(),
+          coursesRes.json(),
+          scheduleRes.json(),
+        ]);
+
+        if (leaveData.leaveRequests) {
           setPendingLeaves(
-            data.leaveRequests.map((l: any) => ({
+            leaveData.leaveRequests.map((l: any) => ({
               id: l.id,
               student: l.profile?.name || 'Student Applicant',
               roll: l.profile?.student?.rollNumber || 'CS2026',
@@ -30,6 +46,20 @@ export default function FacultyDashboard() {
               reason: l.reason,
             }))
           );
+        }
+
+        if (coursesData.courses) {
+          const totalStuds = coursesData.courses.reduce((acc: number, c: any) => acc + (c.enrollmentsCount || 0), 0);
+          const totalAssigns = coursesData.courses.reduce((acc: number, c: any) => acc + (c.assignmentsCount || 0), 0);
+          setFacultyStats({
+            totalStudents: totalStuds,
+            activeCourses: coursesData.courses.length,
+            assignmentsCreated: totalAssigns,
+          });
+        }
+
+        if (scheduleData.lectures) {
+          setTodayClasses(scheduleData.lectures);
         }
       } catch (e) {
         console.warn('Faculty dashboard live load note:', e);
@@ -40,10 +70,10 @@ export default function FacultyDashboard() {
   }, []);
 
   const stats = [
-    { name: 'Total Students', value: 'Enrolled', icon: <Users className="h-6 w-6" />, color: 'bg-[#2563EB]' },
-    { name: 'Active Courses', value: 'Assigned', icon: <BookOpen className="h-6 w-6" />, color: 'bg-[#3B82F6]' },
-    { name: 'Assignments Created', value: 'Active', icon: <ClipboardList className="h-6 w-6" />, color: 'bg-[#60A5FA]' },
-    { name: 'Pending Leave Approvals', value: `${pendingLeaves.length}`, icon: <Bell className="h-6 w-6" />, color: 'bg-[#D97706]' },
+    { name: 'Total Enrolled Students', value: String(facultyStats.totalStudents), icon: <Users className="h-6 w-6" />, color: 'bg-[#2563EB]' },
+    { name: 'Assigned Courses', value: String(facultyStats.activeCourses), icon: <BookOpen className="h-6 w-6" />, color: 'bg-[#3B82F6]' },
+    { name: 'Assignments Published', value: String(facultyStats.assignmentsCreated), icon: <ClipboardList className="h-6 w-6" />, color: 'bg-[#60A5FA]' },
+    { name: 'Pending Leave Approvals', value: String(pendingLeaves.length), icon: <Bell className="h-6 w-6" />, color: 'bg-[#D97706]' },
   ];
 
   return (
@@ -151,6 +181,9 @@ export default function FacultyDashboard() {
           )}
         </div>
       </div>
+
+      {/* Quick Actions Grid for Faculty */}
+      <QuickActionsGrid role="faculty" />
     </div>
   );
 }

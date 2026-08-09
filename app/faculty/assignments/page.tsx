@@ -5,7 +5,7 @@ import { ClipboardList, Plus, Calendar, CheckCircle2, Clock } from 'lucide-react
 import { format } from 'date-fns';
 import EmptyState from '@/components/ui/EmptyState';
 
-interface Assignment {
+interface AssignmentItem {
   id: string;
   title: string;
   course: string;
@@ -15,87 +15,93 @@ interface Assignment {
   totalStudents: number;
 }
 
+interface CourseItem {
+  id: string;
+  code: string;
+  name: string;
+}
+
 export default function FacultyAssignmentsPage() {
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [assignments, setAssignments] = useState<Assignment[]>([
-    {
-      id: 'demo-1',
-      title: 'Unit-5 Partial Differential Equations',
-      course: 'Maths-II',
-      dueDate: '2026-08-15',
-      maxMarks: 50,
-      submittedCount: 38,
-      totalStudents: 45,
-    },
-  ]);
+  const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
+  const [courses, setCourses] = useState<CourseItem[]>([]);
+
+  const [form, setForm] = useState({
+    title: '',
+    courseId: '',
+    dueDate: '',
+    maxMarks: 50,
+  });
+
+  const fetchFacultyCourses = async () => {
+    try {
+      const res = await fetch('/api/faculty/courses');
+      const data = await res.json();
+      if (data.courses && data.courses.length > 0) {
+        setCourses(data.courses);
+        setForm((prev) => ({ ...prev, courseId: data.courses[0].id }));
+      }
+    } catch (e) {
+      console.warn('Error fetching faculty courses:', e);
+    }
+  };
 
   const fetchAssignments = async () => {
     try {
       const res = await fetch('/api/assignments');
       const data = await res.json();
-      if (data.assignments && data.assignments.length > 0) {
-        const mapped: Assignment[] = data.assignments.map((a: any) => ({
+      if (data.assignments) {
+        const mapped: AssignmentItem[] = data.assignments.map((a: any) => ({
           id: a.id,
           title: a.title,
-          course: a.course?.name || 'Maths-II',
+          course: `${a.course?.name || 'Course'} (${a.course?.code || ''})`,
           dueDate: new Date(a.dueDate).toISOString().split('T')[0],
           maxMarks: a.maxMarks,
           submittedCount: a.submissions?.length || 0,
-          totalStudents: 45,
+          totalStudents: a.totalEnrolled || 0,
         }));
         setAssignments(mapped);
       }
     } catch (e) {
-      console.warn('Using default demo assignments:', e);
+      console.warn('Assignments fetch note:', e);
     }
   };
 
   useEffect(() => {
+    fetchFacultyCourses();
     fetchAssignments();
   }, []);
 
-  const [form, setForm] = useState({
-    title: '',
-    course: 'AHT-005',
-    dueDate: '',
-    maxMarks: 50,
-  });
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title || !form.dueDate) return;
+    if (!form.title || !form.dueDate || !form.courseId) return;
     setIsSubmitting(true);
 
-    const newAssignment: Assignment = {
-      id: Date.now().toString(),
-      title: form.title,
-      course: form.course === 'AHT-005' ? 'Maths-II' : 'Engineering Mathematics',
-      dueDate: form.dueDate,
-      maxMarks: Number(form.maxMarks),
-      submittedCount: 0,
-      totalStudents: 45,
-    };
-
-    setAssignments([newAssignment, ...assignments]);
-
     try {
-      await fetch('/api/assignments', {
+      const res = await fetch('/api/assignments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: form.title,
-          courseCode: form.course,
+          courseId: form.courseId,
           dueDate: form.dueDate,
-          maxMarks: form.maxMarks,
+          maxMarks: Number(form.maxMarks),
         }),
       });
+
+      const data = await res.json();
+      if (data.success) {
+        fetchAssignments();
+        setShowModal(false);
+        setForm((prev) => ({ ...prev, title: '', dueDate: '', maxMarks: 50 }));
+      } else {
+        alert(data.error || 'Failed to create assignment');
+      }
     } catch (err) {
-      console.warn('Saved assignment locally:', err);
+      console.error('Save assignment error:', err);
     } finally {
       setIsSubmitting(false);
-      setShowModal(false);
-      setForm({ title: '', course: 'AHT-005', dueDate: '', maxMarks: 50 });
     }
   };
 
@@ -108,11 +114,18 @@ export default function FacultyAssignmentsPage() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="aurora-btn-primary px-4 py-2 text-xs flex items-center cursor-pointer"
+          disabled={courses.length === 0}
+          className="aurora-btn-primary px-4 py-2 text-xs flex items-center cursor-pointer disabled:opacity-50"
         >
           <Plus className="mr-1.5 h-4 w-4" /> Create Assignment
         </button>
       </div>
+
+      {courses.length === 0 && (
+        <div className="rounded-2xl border border-amber-200 dark:border-[#D97706]/30 bg-amber-50 dark:bg-[#D97706]/10 p-4 text-xs font-bold text-amber-800 dark:text-[#FBBF24]">
+          Notice: You currently have no assigned courses. Ask the Administrator to assign you to a course in Academic Setup before publishing assignments.
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
@@ -120,7 +133,7 @@ export default function FacultyAssignmentsPage() {
             <h2 className="text-lg font-bold text-[#111827] dark:text-[#F5F7FA]">Create New Assignment</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Assignment Title</label>
+                <label className="block text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Assignment Title *</label>
                 <input
                   type="text"
                   required
@@ -132,20 +145,24 @@ export default function FacultyAssignmentsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Course</label>
+                <label className="block text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Course *</label>
                 <select
-                  value={form.course}
-                  onChange={(e) => setForm({ ...form, course: e.target.value })}
+                  required
+                  value={form.courseId}
+                  onChange={(e) => setForm({ ...form, courseId: e.target.value })}
                   className="mt-1 w-full rounded-xl border border-[#E5EAF2] dark:border-[#27313B] bg-[#F5F8FC] dark:bg-[#1A2129] p-2.5 text-sm text-[#111827] dark:text-[#F5F7FA] focus:border-[#2563EB] focus:outline-none"
                 >
-                  <option value="AHT-005">Maths-II (AHT-005)</option>
-                  <option value="AHT-001">Engineering Mathematics (AHT-001)</option>
+                  {courses.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.code}: {c.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Due Date</label>
+                  <label className="block text-xs font-bold text-[#475569] dark:text-[#A3ADB8]">Due Date *</label>
                   <input
                     type="date"
                     required
@@ -189,8 +206,8 @@ export default function FacultyAssignmentsPage() {
       <div className="grid grid-cols-1 gap-4">
         {assignments.length === 0 ? (
           <EmptyState
-            title="No Assignments Created"
-            description="You haven't published any coursework assignments yet. Click 'Create Assignment' above to publish one."
+            title="No Assignments Published"
+            description="You haven't published any coursework assignments for your assigned subjects yet. Click 'Create Assignment' above to publish one."
             icon={ClipboardList}
           />
         ) : (
@@ -208,10 +225,10 @@ export default function FacultyAssignmentsPage() {
 
               <div className="mt-4 sm:mt-0 text-left sm:text-right">
                 <p className="text-sm font-bold text-[#111827] dark:text-[#F5F7FA]">
-                  {a.submittedCount} / {a.totalStudents} Submissions
+                  {a.submittedCount} / {a.totalStudents} Submissions Received
                 </p>
-                <button className="mt-2 rounded-xl bg-[#DBEAFE] dark:bg-[#1A2129] px-3.5 py-1.5 text-xs font-extrabold text-[#2563EB] dark:text-[#60A5FA] hover:bg-blue-100 dark:hover:bg-[#27313B] border border-[#2563EB]/20 dark:border-[#27313B] transition-all cursor-pointer">
-                  Evaluate Submissions
+                <button className="mt-2 rounded-xl bg-[#DBEAFE] dark:bg-[#1A2129] px-3.5 py-1.5 text-xs font-extrabold text-[#2563EB] dark:text-[#60A5FA] border border-[#2563EB]/20 dark:border-[#27313B]">
+                  {a.submittedCount > 0 ? 'Review Submissions' : 'Awaiting Submissions'}
                 </button>
               </div>
             </div>
@@ -221,4 +238,3 @@ export default function FacultyAssignmentsPage() {
     </div>
   );
 }
-

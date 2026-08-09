@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Check, AlertCircle, PieChart, Users } from 'lucide-react';
+import { Check, AlertCircle, PieChart, Users, RefreshCw } from 'lucide-react';
 import StatCard from '@/components/ui/StatCard';
 import EmptyState from '@/components/ui/EmptyState';
 
@@ -15,20 +15,55 @@ interface SubjectAttendance {
 
 export default function StudentAttendancePage() {
   const [subjects, setSubjects] = useState<SubjectAttendance[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAttendance = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/attendance');
+      const data = await res.json();
+
+      const records = data.attendance || [];
+
+      if (records.length > 0) {
+        const grouped: Record<string, { name: string; code: string; present: number; total: number }> = {};
+
+        records.forEach((r: any) => {
+          const cCode = r.course?.code || 'COURSE';
+          const cName = r.course?.name || 'Academic Course';
+
+          if (!grouped[cCode]) {
+            grouped[cCode] = { name: cName, code: cCode, present: 0, total: 0 };
+          }
+
+          grouped[cCode].total += 1;
+          if (r.status === 'present' || r.status === 'late') {
+            grouped[cCode].present += 1;
+          }
+        });
+
+        const list: SubjectAttendance[] = Object.values(grouped).map((g) => ({
+          name: g.name,
+          code: g.code,
+          present: g.present,
+          total: g.total,
+          percentage: g.total > 0 ? Math.round((g.present / g.total) * 100) : 0,
+        }));
+
+        setSubjects(list);
+      } else {
+        setSubjects([]);
+      }
+    } catch (e) {
+      console.warn('Attendance load note:', e);
+      setSubjects([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadAttendance() {
-      try {
-        const res = await fetch('/api/attendance');
-        const data = await res.json();
-        if (data.records) {
-          // map live records
-        }
-      } catch (e) {
-        console.warn('Attendance load note:', e);
-      }
-    }
-    loadAttendance();
+    fetchAttendance();
   }, []);
 
   const overall = subjects.length > 0
@@ -42,18 +77,24 @@ export default function StudentAttendancePage() {
           <h1 className="text-2xl font-extrabold text-[#111827] dark:text-[#F5F7FA]">Attendance Overview</h1>
           <p className="text-sm font-medium text-[#475569] dark:text-[#A3ADB8]">Track your class attendance and eligibility thresholds</p>
         </div>
+        <button
+          onClick={fetchAttendance}
+          className="aurora-btn-primary px-3.5 py-2 text-xs flex items-center cursor-pointer"
+        >
+          <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        </button>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           title="Overall Attendance"
-          value={`${overall}%`}
+          value={subjects.length > 0 ? `${overall}%` : 'N/A'}
           icon={<PieChart className="h-6 w-6" />}
           color={overall >= 75 ? 'bg-[#16A34A]' : 'bg-[#DC2626]'}
         />
         <StatCard
-          title="Total Subjects"
+          title="Total Enrolled Subjects"
           value={subjects.length}
           icon={<Check className="h-6 w-6" />}
           color="bg-[#2563EB]"
@@ -67,10 +108,14 @@ export default function StudentAttendancePage() {
       </div>
 
       {/* Subject Breakdown Table */}
-      {subjects.length === 0 ? (
+      {loading ? (
+        <div className="p-12 text-center text-xs font-semibold text-[#475569] dark:text-[#A3ADB8]">
+          Loading attendance history...
+        </div>
+      ) : subjects.length === 0 ? (
         <EmptyState
           title="No Attendance Records Found"
-          description="Attendance records for your registered subjects have not been uploaded yet."
+          description="Attendance records for your registered subjects have not been uploaded by faculty yet."
           icon={Users}
         />
       ) : (
@@ -127,4 +172,3 @@ export default function StudentAttendancePage() {
     </div>
   );
 }
-
